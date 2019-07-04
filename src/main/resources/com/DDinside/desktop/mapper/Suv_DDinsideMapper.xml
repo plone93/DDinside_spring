@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+ <mapper namespace="com.DDinside.desktop.mapper.Suv_DDinsideMapper">
+ 
+	 <select id="selectAllBoards" resultType="com.DDinside.desktop.domain.BoardVO">
+	 select * from DDinside where order by num desc
+	 </select>
+	 
+	 <select id="selectUserId" parameterType="hashmap" resultType="String">
+	 select userid from DDinside where num = #{num}
+	 </select>
+	 
+	 <select id="BoardView" parameterType="hashmap" resultType="com.DDinside.desktop.domain.BoardVO">
+	 select * from DDinside where num = #{num}
+	 </select>
+	 
+	 <update id="updateReadCount" parameterType="hashmap" >
+	 update DDinside set readcount = readcount +1 where num= #{num} and board_id= #{board_id}
+	 </update>
+	 
+	 <update id="postUpCount" parameterType="hashmap">
+	 update DDinside set up=up+1 where num= #{num}
+	 </update>
+	 
+	 <update id="postDownCount" parameterType="hashmap">
+	 update DDinside set down=down+1 where num= #{num}
+	 </update>
+	 
+	 <update id="postAhoCount" parameterType="hashmap">
+	 update DDinside set aho=aho+1 where num= #{num}
+	 </update>
+	 
+	 <update id="postReport" parameterType="hashmap">
+	 update DDinside set report=report+1 where num= #{num}
+	 </update>
+	 
+	 <select id="getReadCount" parameterType="hashmap" resultType="int">
+	 select readcount from DDinside where num = #{num}
+	 </select>
+	 
+	 <select id="getPostCount" parameterType="hashmap" resultType="com.DDinside.desktop.domain.CountVO">
+	 select up, down, aho from DDinside where num = #{num}
+	 </select>
+	 
+	 <delete id="boardDelete">
+	 delete from DDinside where num = ?
+	 </delete>
+	 
+	 <select id="selectAllBoard" resultType="com.DDinside.desktop.domain.BoardVO">
+	 Select * from (SELECT * FROM (SELECT T.*, ROW_NUMBER() OVER(ORDER BY writedate DESC) AS RNUM FROM DDinside T) 
+	 WHERE RNUM BETWEEN ? AND ?) where up >= 5
+	 </select>
+	 
+	 <!-- 중복  -->
+	 <select id="selectAllBoardHot" resultType="com.DDinside.desktop.domain.BoardVO">
+	 Select * from (SELECT * FROM (SELECT T.*, ROW_NUMBER() OVER(ORDER BY writedate DESC) AS RNUM FROM DDinside T) 
+	 WHERE RNUM BETWEEN ? AND ?) where "+word+">="+hotcount
+	 </select>
+	 
+ 	 <!-- 2번째 SQL 필요 -->
+<!-- 	 <select id="selectAllBoard_suv" parameterType="hashmap" resultType="com.DDinside.desktop.domain.BoardVO">
+	 SELECT * from
+	 (SELECT * from
+	 (SELECT T.*, ROW_NUMBER() OVER(ORDER BY writedate DESC) AS RNUM FROM DDinside T)
+	 WHERE #{word} <![CDATA[>]]> #{hotcount})
+	 WHERE RNUM BETWEEN #{startNum} AND #{endNum}
+	 </select>  -->
+	
+	 <select id="selectAllBoard_Up" parameterType="hashmap" resultType="com.DDinside.desktop.domain.BoardVO">
+	 SELECT * from
+	 (SELECT T.*, ROW_NUMBER() OVER(ORDER BY writedate DESC) AS RNUM FROM DDinside T WHERE up <![CDATA[>]]> #{hotcount})
+	 WHERE RNUM BETWEEN #{startNum} AND #{endNum}
+	 </select>
+	 
+	 <select id="selectAllBoard_Down" parameterType="hashmap" resultType="com.DDinside.desktop.domain.BoardVO">
+	 SELECT * from
+	 (SELECT T.*, ROW_NUMBER() OVER(ORDER BY writedate DESC) AS RNUM FROM DDinside T where down <![CDATA[>]]> #{hotcount})
+	 WHERE RNUM BETWEEN #{startNum} AND #{endNum}
+	 </select>
+	 
+	 <select id="selectAllBoard_Aho" parameterType="hashmap" resultType="com.DDinside.desktop.domain.BoardVO">
+	 SELECT * from
+	 (SELECT T.*, ROW_NUMBER() OVER(ORDER BY writedate DESC) AS RNUM FROM DDinside T WHERE aho <![CDATA[>]]> #{hotcount})
+	 WHERE RNUM BETWEEN #{startNum} AND #{endNum}
+	 </select>
+	 
+	 <select id="selectAllBoardTotal" resultType="com.DDinside.desktop.domain.BoardVO">
+	 SELECT * FROM (SELECT T.*, ROW_NUMBER() OVER(ORDER BY writedate DESC) AS RNUM FROM DDinside T) 
+	 WHERE RNUM BETWEEN #{startNum} AND #{endNum}
+	 </select>
+	 
+	 <select id="selectAllBoardReport" parameterType="hashmap" resultType="com.DDinside.desktop.domain.BoardVO">
+	 SELECT * from(SELECT T.*, ROW_NUMBER() OVER(ORDER BY writedate DESC) AS RNUM FROM DDinside T 
+	 where #{word} >= 1) WHERE RNUM BETWEEN #{startNum} AND #{endNum}
+	 </select>
+	 
+	 <select id="selectAllBoardNotice" resultType="com.DDinside.desktop.domain.BoardVO">
+	 Select * from (SELECT * FROM (SELECT T.*, ROW_NUMBER() OVER(ORDER BY writedate DESC) AS RNUM FROM DDinside T) 
+	 WHERE RNUM BETWEEN ? AND ?) where board_id = ?
+	 </select>
+	 
+	 <!-- SQL 추가 끝 -->
+	 
+	 <select id="selectAllAccount" parameterType="hashmap" resultType="com.DDinside.desktop.domain.MemberVO">
+	 Select * from (SELECT * FROM (SELECT T.*, ROW_NUMBER() OVER(ORDER BY joindate) AS RNUM FROM memberlist1 T) 
+	 WHERE RNUM BETWEEN #{startNum} AND #{endNum})
+	 </select>
+	 
+	 <select id="tableCount" parameterType="hashmap" resultType="int">
+	 select COUNT(*) from DDinside where #{word} <![CDATA[>]]> #{hotcount}
+	 </select>
+	 
+	 	 <select id="tableCount_Up" parameterType="hashmap" resultType="int">
+	 select COUNT(*) from DDinside where up <![CDATA[>]]> #{hotcount}
+	 </select>
+	 
+	 	 <select id="tableCount_Down" parameterType="hashmap" resultType="int">
+	 select COUNT(*) from DDinside where down <![CDATA[>]]> #{hotcount}
+	 </select>
+	 
+	 	 <select id="tableCount_Aho" parameterType="hashmap" resultType="int">
+	 select COUNT(*) from DDinside where aho <![CDATA[>]]> #{hotcount}
+	 </select>
+	 
+	 <select id="tableCountTotal" resultType="int">
+	 select COUNT(*) from DDinside
+	 </select>
+	 
+	 <select id="memberCountTotal" resultType="int">
+	 select COUNT(*) from memberlist1
+	 </select>
+	 
+	 <select id="tableCountReport" resultType="int">
+	 select COUNT(*) from DDinside where "+word+" >= 1
+	 </select>
+	 
+	 <select id="tableCountNotice" resultType="int">
+	 select COUNT(*) from DDinside where board_id = ?
+	 </select>
+	 
+	 <select id="tableCountView" resultType="int">
+	 select COUNT(*) from DDinside where board_id = #{board_id}
+	 </select>
+	 
+	 <select id="searchTableCount" parameterType="hashmap" resultType="int">
+	 select COUNT(*) from (select * from DDinside 
+	 where title LIKE '%'||#{searchVO.keyWord}||'%' or content  LIKE '%'||#{searchVO.keyWord}||'%') 
+	 where #{word} >= #{hotcount}
+	 </select>
+	 
+<!-- 	 <select id="searchTableCount" resultType="int">
+	 select COUNT(*) from (select * from DDinside where title LIKE '%'||?||'%' or content  LIKE '%'||?||'%') where board_id =?
+	 </select>
+	 
+	 <select id="searchTableCount" resultType="int">
+	 select COUNT(*) from (select * from DDinside where title LIKE '%'||?||'%' or content  LIKE '%'||?||'%') where "+word+" >= "+hotcount
+	 </select> -->
+	 
+	 <select id="searchTableCountReport" parameterType="hashmap" resultType="int">
+	 select COUNT(*) from (select * from DDinside 
+	 where title LIKE '%'||#{searchVO.keyWord}||'%' or content  LIKE '%'||#{searchVO.keyWord}||'%') 
+	 where #{word} >= 1
+	 </select>
+	 
+	 <select id="serachTableCountDown" resultType="int">
+	 select COUNT(*) from (select * from DDinside where title LIKE '%'||?||'%' or content  LIKE '%'||?||'%') 
+	 where board_id =? and down >= 5
+	 </select>
+	 
+	 <select id="searchTableCountAho" resultType="int">
+	 select COUNT(*) from (select * from DDinside where title LIKE '%'||?||'%' or content  LIKE '%'||?||'%') 
+	 where board_id =? and aho >= 5 
+	 </select>
+	 
+	 <select id="searchTableCountTotal" parameterType="hashmap" resultType="int">
+	 select COUNT(*) from (select * from DDinside where title LIKE '%'||#{searchVO.keyWord}||'%' or content  LIKE '%'||#{searchVO.keyWord}||'%')
+	 </select>
+	 
+	 <select id="searchMemberCount" parameterType="hashmap" resultType="int">
+	 select COUNT(*) from (select * from memberList1 where title LIKE '%'||#{searchVO.keyWord}||'%' or content  LIKE '%'||#{searchVO.keyWord}||'%')
+	 </select>
+	 
+	 <select id="selectNotice" resultType="com.DDinside.desktop.domain.BoardVO">
+	 SELECT * FROM (SELECT T.*, ROW_NUMBER() OVER(ORDER BY writedate DESC) AS RNUM FROM Noticeboard1 T) WHERE RNUM BETWEEN ? AND ?
+	 </select>
+	 
+	 <insert id="insertComment" parameterType="hashmap">
+	 insert into DDinside_comment(board_id, num, board_num, board_title, writer_id, writer_name, content) 
+	 values(#{board_id}, DDinside_comment_seq.nextval, #{commentVO.board_num},#{commentVO.board_title},#{commentVO.board_title},#{commentVO.writer_name},#{commentVO.content})
+	 </insert>
+	 
+	 <select id="selectComment" parameterType="hashmap" resultType="com.DDinside.desktop.domain.CommentVO">
+	 select * from (select * from DDinside_comment order by writedate asc) where board_num = #{num}
+	 </select>
+	 
+	 <!-- 다중 SQL  -->
+	 <select id="search" parameterType="hashmap" resultType="com.DDinside.desktop.domain.BoardVO">
+	 SELECT * FROM (SELECT T.*, ROW_NUMBER() OVER(ORDER BY writedate DESC) AS RNUM FROM DDinside T where #{word} >= #{hotcount} and (title LIKE '%'||?||'%' or content  LIKE '%'||?||'%')) WHERE RNUM BETWEEN ? AND ?
+	 </select>
+	 
+	 <select id="searchReport" parameterType="hashmap" resultType="com.DDinside.desktop.domain.BoardVO">
+	 SELECT * FROM (SELECT T.*, ROW_NUMBER() OVER(ORDER BY writedate DESC) AS RNUM FROM DDinside T where #{word} >= 1 and (title LIKE '%'||#{searchVO.keyWord}||'%' or content  LIKE '%'||#{searchVO.keyWord}||'%')) WHERE RNUM BETWEEN #{startNum} AND #{endNum}
+	 </select>
+	 
+	 <select id="searchDown" resultType="com.DDinside.desktop.domain.BoardVO">
+	 select * from (select * from DDinside where title LIKE '%'||?||'%' or content  LIKE '%'||?||'%') where board_id = ? and down >= 5  order by writedate desc
+	 </select>
+	 
+	 <select id="searchAho" resultType="com.DDinside.desktop.domain.BoardVO">
+	 select * from (select * from DDinside where title LIKE '%'||?||'%'  or content  LIKE '%'||?||'%') where board_id = ? and aho >= 5  order by writedate desc
+	 </select>
+	 
+	 <select id="searchTotal" parameterType="hashmap" resultType="com.DDinside.desktop.domain.BoardVO">
+	 SELECT * FROM (SELECT T.*, ROW_NUMBER() OVER(ORDER BY writedate DESC) AS RNUM FROM DDinside T where title LIKE '%'||#{searchVO.keyWord}||'%' or content  LIKE '%'||#{searchVO.keyWord}||'%') WHERE RNUM BETWEEN #{startNum} AND #{endNum}
+	 </select>
+	 
+	 <select id="searchAccount" parameterType="hashmap" resultType="com.DDinside.desktop.domain.BoardVO">
+	 Select * from (SELECT * FROM (SELECT T.*, ROW_NUMBER() OVER(ORDER BY joindate DESC) AS RNUM FROM memberlist1 T) WHERE RNUM BETWEEN #{startNum} AND #{endNum})where id LIKE '%'||#{searchVO.keyWord}||'%' or name LIKE '%'||#{searchVO.keyWord}||'%'"
+	 </select>
+	 
+	 <select id="commentView" parameterType="hashmap" resultType="com.DDinside.desktop.domain.CommentVO">
+	 select * from DDinside_comment where num = #{num}
+	 </select>
+	 
+	 <update id="updateComment" parameterType="hashmap">
+	 update DDinside_comment set content = #{commentVO.content} where num = #{comment_num}
+	 </update>
+	 
+	 <delete id="commentDelete" parameterType="hashmap">
+	 delete from DDinside_comment where num = #{comment_num}
+	 </delete>
+	 
+	 <insert id="insertBoard">
+	 insert into DDinside(board_id, num, name, title, content, userid, item) values(?, DDinside_seq.nextval, ?,?,?,?,?)
+	 </insert>
+	 
+	 <update id="updateBoard" parameterType="hashmap">
+	 update DDinside set title= #{boardVO.title}, content= #{boardVO.content}, item=#{boardVO.item} where num = #{num}
+	 </update>
+ </mapper>

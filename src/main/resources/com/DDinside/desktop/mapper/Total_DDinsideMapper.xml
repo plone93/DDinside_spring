@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+  <mapper namespace="com.DDinside.desktop.mapper.Total_DDinsideMapper">
+  
+  <select id="selectAllBoards" resultType="com.DDinside.desktop.domain.BoardVO">
+  select * from DDinside where order by num desc
+  </select>
+  
+  <insert id="insertBoard">
+  insert into DDinside(board_id, num, name, title, content, userid, item) values(?, DDinside_seq.nextval, ?,?,?,?,?)
+  </insert>
+  
+  <select id="selectUserId" resultType="String">
+  select userid from DDinside where num = ? and board_id=?
+  </select>
+  
+  <select id="BoardView" resultType="com.DDinside.desktop.domain.BoardVO">
+  select * from DDinside where num = ? and board_id=?
+  </select>
+  
+  <update id="updateReadCount">
+  update DDinside set readcount=readcount+1 where num=? and board_id=?
+  </update>
+  
+  <update id="postUpCount">
+  update DDinside set up=up+1 where num=? and board_id=?
+  </update>
+  
+  <update id="postDownCount">
+  update DDinside set down=down-1 where num=? and board_id=?
+  </update>
+  
+  <update id="postAhoCount">
+  update DDinside set aho=aho+1 where num=? and board_id =?
+  </update>
+  
+  <update id="postReport">
+  update DDinside set report=report+1 where num=? and board_id=?
+  </update>
+  
+  <select id="getReadCount" resultType="int">
+  select readcount from DDinside where num = ? and board_id=?
+  </select>
+  
+  <select id="getPostCount" resultType="com.DDinside.desktop.domain.CountVO">
+  select up, down, aho from DDinside where num = ? and board_id=?
+  </select>
+  
+  <update id="updateBoard">
+  update DDinside set title=?, pass=?, content=?, item=? where num =? and board_id=?
+  </update>
+  
+  <delete id="boardDelete">
+  delete from DDinside where num = ? and board_id=?
+  </delete>
+  
+  <select id="selectAllBoard" resultType="com.DDinside.desktop.domain.BoardVO">
+  Select * from (SELECT * FROM (SELECT T.*, ROW_NUMBER() OVER(ORDER BY writedate DESC) AS RNUM FROM DDinside T) WHERE RNUM BETWEEN ? AND ?) where board_id = ?
+  </select>
+  
+  <select id="tableCount" resultType="int">
+  select COUNT(*) from DDinside where board_id = ?
+  </select>
+  
+  <select id="searchTableCount" resultType="int">
+  select COUNT(*) from (select * from DDinside where title LIKE '%'||?||'%' or content  LIKE '%'||?||'%')
+  </select>
+  
+  <select id="selectNotice" resultType="com.DDinside.desktop.domain.BoardVO">
+  SELECT * FROM (SELECT T.*, ROW_NUMBER() OVER(ORDER BY writedate DESC) AS RNUM FROM Noticeboard1 T) WHERE RNUM BETWEEN ? AND ?
+  </select>
+  
+  <insert id="insertcomment">
+  insert into DDinside_comment(board_id, num, board_num, board_title, writer_id, writer_name, content) values(?, DDinside_comment_seq.nextval, ?,?,?,?,?)
+  </insert>
+  
+  <select id="selectComment" resultType="com.DDinside.desktop.domain.CommentVO">
+  select * from (select * from DDinside_comment order by writedate asc) where board_num = ? and board_id =?
+  </select>
+  
+  <select id="search" resultType="com.DDinside.desktop.domain.BoardVO">
+  select * from (select * from DDinside where title LIKE '%'||?||'%'  or content  LIKE '%'||?||'%') order by writedate desc
+  </select>
+  
+  <select id="commentView" resultType="com.DDinside.desktop.domain.CommentVO">
+  select * from DDinside_comment where num = ? and board_id=?
+  </select> 
+  
+  <update id="updateComment">
+  update DDinside_comment set content = ? where num = ? and board_id=?
+  </update>
+  
+  <delete id="commentDelete">
+  delete from DDinside_comment where num = ? and board_id=?
+  </delete>
+  </mapper>
+ 

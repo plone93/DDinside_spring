@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+ <mapper namespace="com.DDinside.desktop.mapper.DDinsideMapper">
+ 	<select id="selectAllboards" resultType="com.DDinside.desktop.domain.BoardVO">
+ 	select * from DDinside where order by num desc
+ 	</select>
+ 
+ 	<select id="selectUserId" parameterType="hashmap" resultType="String">
+ 	select userid from DDinside where num = #{num} and board_id = #{board_id}
+ 	</select>
+ 	
+ 	<select id="BoardView" parameterType="hashmap" resultType="com.DDinside.desktop.domain.BoardVO">
+ 	select * from DDinside where num = #{num} and board_id= #{board_id}
+ 	</select>
+ 	
+ 	<update id="updateReadCount" parameterType="hashmap">
+ 	update DDinside set readcount = readcount+1 where num = #{num} and board_id = #{board_id}
+ 	</update>
+ 	
+ 	<update id="postUpCount" parameterType="hashmap">
+ 	update DDinside set up=up+1 where num= #{num} and board_id= #{board_id}
+ 	</update>
+ 	
+ 	<update id="postDownCount" parameterType="hashmap">
+ 	update DDinside set down=down+1 where num= #{num} and board_id= #{board_id}
+ 	</update>
+ 	
+ 	<update id="postAhoCount" parameterType="hashmap">
+ 	update DDinside set aho=aho+1 where num= #{num} and board_id= #{board_id}
+ 	</update>
+ 	
+ 	<update id="postReport" parameterType="hashmap">
+ 	update DDinside set report=report+1 where num= #{num} and board_id= #{board_id}
+ 	</update>
+ 	
+ 	<select id="getReadCount" parameterType="hashmap" resultType="int">
+ 	select readcount from DDinside where num = #{num} and board_id = #{board_id}
+ 	</select>
+ 	
+ 	<select id="getPostCount" parameterType="hashmap" resultType="com.DDinside.desktop.domain.CountVO">
+ 	select up, down, aho from DDinside where num = #{num} and board_id = #{board_id}
+ 	</select>
+ 	
+ 	<delete id="boardDelete" parameterType="hashmap">
+ 	delete from DDinside where num = #{num}
+ 	</delete>
+ 	
+ 	<select id="selectAllBoard" parameterType="hashmap" resultType="com.DDinside.desktop.domain.BoardVO">
+ 	SELECT * FROM (SELECT T.*, ROW_NUMBER() OVER(ORDER BY writedate DESC) AS RNUM FROM DDinside T where board_id = #{board_id}) WHERE RNUM BETWEEN #{startNum} AND #{endNum}
+ 	</select>
+ 	
+ 	<select id="selectAllBoard_CC" parameterType="hashmap" resultType="int">
+ 	select count(*) from DDinside_comment where board_num = #{num} and board_id = #{board_id}
+ 	</select>
+ 	
+ 	<select id="tableCount" resultType="int">
+ 	select COUNT(*) from DDinside where board_id = #{board_id}
+ 	</select>
+ 	
+ 	<select id="searchTableCount" parameterType="hashmap" resultType="int">
+ 	select COUNT(*) from (select * from DDinside where title LIKE '%'||#{searchVO.keyWord}||'%' or content  LIKE '%'||#{searchVO.keyWord}||'%') where board_id = #{board_id}
+ 	</select>
+ 	
+ 	<select id="searchTableCountSuv" resultType="int">
+ 	select COUNT(*) from (select * from DDinside where title LIKE '%'||?||'%' or content  LIKE '%'||?||'%') where "+word+" >= 1
+ 	</select>
+ 	
+ 	<select id="searchTableCountTotal" resultType="int">
+ 	select COUNT(*) from (select * from DDinside where title LIKE '%'||?||'%' or content  LIKE '%'||?||'%')
+ 	</select>
+ 	
+ 	<select id="selectNotice" resultType="com.DDinside.desktop.domain.BoardVO">
+ 	SELECT * FROM DDinside WHERE board_id = #{board_id}
+ 	</select>
+ 	
+ 	<insert id="insertComment" parameterType="hashmap">
+ 	insert into DDinside_comment(board_id, num, board_num, board_title, writer_id, writer_name, content) 
+ 	values(#{board_id}, DDinside_comment_seq.nextval, #{commentVO.board_num},#{commentVO.board_title},#{commentVO.writer_id},#{commentVO.writer_name},#{commentVO.content})
+ 	</insert>
+ 	
+ 	<select id="selectComment" parameterType="hashmap" resultType="com.DDinside.desktop.domain.CommentVO">
+ 	select * from (select * from DDinside_comment order by writedate asc) where board_num = #{num} and board_id = #{board_id}
+ 	</select>
+ 	
+ 	<select id="commentCount" resultType="int">
+ 	select count(*) from DDinside_comment where board_num = #{board_num} and board_id = #{board_id}
+ 	</select>
+ 	
+<!--  	<select id="commentCount" resultType="int">
+ 	select * from (select * from DDinside_comment order by writedate asc) where board_num = ? and board_id =?
+ 	</select> -->
+ 	
+ 	<select id="search" parameterType="hashmap" resultType="com.DDinside.desktop.domain.BoardVO">
+ 	SELECT * FROM (SELECT T.*, ROW_NUMBER() OVER(ORDER BY writedate DESC) AS RNUM FROM DDinside T where board_id = #{board_id} and (title LIKE '%'||#{searchVO.keyWord}||'%' or content  LIKE '%'||#{searchVO.keyWord}||'%')) WHERE RNUM BETWEEN #{startNum} AND #{endNum}
+ 	</select>
+ 	
+ 	<select id="searchTotalCount" resultType="int">
+ 	select count(*) from (select * from DDinside where title LIKE '%'||?||'%'  or content  LIKE '%'||?||'%') where board_id = ?
+ 	</select>
+ 	
+ 	<select id="commentView" parameterType="hashmap" resultType="com.DDinside.desktop.domain.CommentVO">
+ 	select * from DDinside_comment where num = #{num} and board_id= #{board_id}
+ 	</select>
+ 	
+ 	<update id="updateComment" parameterType="hashmap">
+ 	update DDinside_comment set content = #{commentVO.content} where num = #{comment_num} and board_id= #{board_id}
+ 	</update>
+ 	
+ 	<delete id="commentDelete" parameterType="hashmap">
+ 	delete from DDinside_comment where num = #{comment_num} and board_id= #{board_id}
+ 	</delete>
+ 	
+ 	<insert id="insertBoard" parameterType="hashmap">
+ 	insert into DDinside(board_id, num, name, title, content, userid, item) 
+ 	values(#{board_id}, DDinside_seq.nextval, #{boardVO.name},#{boardVO.title},#{boardVO.content},#{boardVO.userid},#{boardVO.item})
+ 	</insert>
+ 	
+ 	<update id="updateBoard" parameterType="hashmap">
+ 	update DDinside set title= #{boardVO.title}, content= #{boardVO.content}, item=#{boardVO.item} where num = #{num} and board_id= #{boardVO.board_id}
+ 	</update>
+ 	
+ 	<select id="mainNoticeBest" resultType="com.DDinside.desktop.domain.BoardVO">
+ 	select * from DDinside where up >= 5
+ 	</select>
+ 	
+ 	<select id="mainNoticeWorst" resultType="com.DDinside.desktop.domain.BoardVO">
+ 	select * from DDinside where down >= 5
+ 	</select>
+ 	
+ 	<select id="mainNoticeAho" resultType="com.DDinside.desktop.domain.BoardVO">
+ 	select * from DDinside where aho >= 5
+ 	</select>
+ 	
+ 	<update id="commentCountUpdate" parameterType="hashmap">
+ 	update DDinside set commentcount = #{commentCount} where num = #{board_num} 
+ 	</update>
+ 
+ 	
+ </mapper>
